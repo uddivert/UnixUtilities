@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <unistd.h>
 
 // needs  -clw [ files
@@ -13,28 +14,33 @@ int lines() { return 0;}
 int words () { return 0;}
 int bytes() { return 0;}
 */
+int main(int argc, char *argv[])
+{
+  int opt;
+  
+  if (argv[optind] == NULL)
+  {
+      printf("wc requires an argument\n");
+      return EXIT_FAILURE;
+  }
 
-int main (int argc, char *argv[]) {
-    int option;
-    while((option = getopt(argc, argv, ":clw:")) != -1)
-    {
-        switch(option) {
-            case ':': 
-                printf("initial");
-                break;
-            case 'c':
-                printf("case c\n");
-                break;
-            case 'l':
-                printf("case l\n");
-                break;
-            case 'w': 
-                printf("case w\n");
-                break;
-            default:
-                printf("invalid option\n");
-                return 1;
-        } // switch
-        return 0;
-    }
-} // main
+  while ((opt = getopt(argc, argv, "clw")) != -1) 
+  {
+      switch (opt) 
+      {
+          case 'c':
+            printf("Option c was provided\n");
+            break;
+          case 'l':
+            printf("Option l was provided\n");
+            break;
+          case 'w':
+            printf("Option w was provided\n");
+            break;
+          case 1:
+            printf("error");
+            return 1;
+        }
+  }
+  return 0;
+}
