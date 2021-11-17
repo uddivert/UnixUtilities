@@ -22,14 +22,14 @@ int main(int argc, char **argv)
     int length = 10;
     int parseByLine = 1;
 
-    // https://www.gnu.org/software/libc/manual/html_node/Example-of-Getopt.html
-    // parse args with getopt and
+    /* https://www.gnu.org/software/libc/manual/html_node/Example-of-Getopt.html
+     parse args with getopt */
     int index;
     int c;
     opterr = 0;
 
-    // loop through all args and set values for length and whether to parse by line or
-    // to parse by bytes
+    /* loop through all args and set values for length and whether to parse by line or
+    to parse by bytes */
     while ((c = getopt(argc, argv, "c:n:")) != -1)
         switch (c)
         {
@@ -43,10 +43,14 @@ int main(int argc, char **argv)
             break;
         }
 
-    //consider all remaining arguments to be files
+    /* consider all remaining arguments to be files */
     for (index = optind; index < argc; index++)
     {
         int fd;
+        int n;
+        int counter = 0;
+        char buffer[1];
+
         if (strcmp(argv[index], "-") == 0)
         {
             fd = STDIN_FILENO;
@@ -56,11 +60,8 @@ int main(int argc, char **argv)
             char *filename = argv[index];
             fd = open(filename, O_RDONLY);
         }
-        int n;
-        int counter = 0;
-        char buffer[1];
 
-        while ((n = read(fd, buffer, 1)) > 0 && counter < length)
+        while (counter < length && (n = read(fd, buffer, 1)) > 0)
         {
             if (parseByLine == 1 && buffer[0] == '\n')
                 counter++;
@@ -68,7 +69,7 @@ int main(int argc, char **argv)
                 counter++;
 
             write(STDOUT_FILENO, buffer, n);
-        } // while
+        }
 
         if (n == -1)
             perror("read");
@@ -76,4 +77,4 @@ int main(int argc, char **argv)
         close(fd);
     }
     return 0;
-} // main
+}
