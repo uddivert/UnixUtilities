@@ -21,5 +21,5 @@ env.o: env.c
 	$(CC) $(CFLAGS) env.c
 
 clean:
-	rm -f p1
+	rm -f head
 	rm -f *.o
