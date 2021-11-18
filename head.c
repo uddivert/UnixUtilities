@@ -18,18 +18,19 @@
  */
 int main(int argc, char **argv)
 {
-
+    // turns off the buffer for printf
+    setbuf(stdout, NULL);
     int length = 10;
     int parseByLine = 1;
 
-    /* https://www.gnu.org/software/libc/manual/html_node/Example-of-Getopt.html
-     parse args with getopt */
+    // https://www.gnu.org/software/libc/manual/html_node/Example-of-Getopt.html
+    // parse args with getopt
     int index;
     int c;
     opterr = 0;
 
-    /* loop through all args and set values for length and whether to parse by line or
-    to parse by bytes */
+    // loop through all args and set values for length and whether to parse by line or
+    // to parse by bytes
     while ((c = getopt(argc, argv, "c:n:")) != -1)
         switch (c)
         {
@@ -43,7 +44,7 @@ int main(int argc, char **argv)
             break;
         }
 
-    /* consider all remaining arguments to be files */
+    // consider all remaining arguments to be files 
     for (index = optind; index < argc; index++)
     {
         int fd;
@@ -54,25 +55,29 @@ int main(int argc, char **argv)
         if (strcmp(argv[index], "-") == 0)
         {
             fd = STDIN_FILENO;
+            printf("==> standard input <==\n");
         }
         else
         {
             char *filename = argv[index];
             fd = open(filename, O_RDONLY);
+            if(fd < 0) {
+                printf("head: cannot open \'%s\' for reading: No such file or directory.\n", filename);
+                continue;
+            }
+            printf("==> %s <==\n", filename);
         }
 
-        while (counter < length && (n = read(fd, buffer, 1)) > 0)
+        do
         {
+            n = read(fd, buffer, 1);
             if (parseByLine == 1 && buffer[0] == '\n')
                 counter++;
             else if (parseByLine != 1)
                 counter++;
 
             write(STDOUT_FILENO, buffer, n);
-        }
-
-        if (n == -1)
-            perror("read");
+        } while (counter < length && n > 0);
 
         close(fd);
     }
