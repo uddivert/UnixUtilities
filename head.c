@@ -27,11 +27,14 @@ int main(int argc, char **argv)
     // parse args with getopt
     int index;
     int c;
+    int remainingArgs = argc-1;
     opterr = 0;
 
     // loop through all args and set values for length and whether to parse by line or
     // to parse by bytes
     while ((c = getopt(argc, argv, "c:n:")) != -1)
+    {
+        remainingArgs--;
         switch (c)
         {
         case 'c':
@@ -43,8 +46,8 @@ int main(int argc, char **argv)
             parseByLine = 1;
             break;
         }
-
-    // consider all remaining arguments to be files 
+    }
+    // consider all remaining arguments to be files
     for (index = optind; index < argc; index++)
     {
         int fd;
@@ -55,17 +58,20 @@ int main(int argc, char **argv)
         if (strcmp(argv[index], "-") == 0)
         {
             fd = STDIN_FILENO;
-            printf("==> standard input <==\n");
+            if (remainingArgs > 1)
+                printf("==> standard input <==\n");
         }
         else
         {
             char *filename = argv[index];
             fd = open(filename, O_RDONLY);
-            if(fd < 0) {
+            if (fd < 0)
+            {
                 printf("head: cannot open \'%s\' for reading: No such file or directory.\n", filename);
                 continue;
             }
-            printf("==> %s <==\n", filename);
+            if (remainingArgs > 1)
+                printf("==> %s <==\n", filename);
         }
 
         do
@@ -78,6 +84,9 @@ int main(int argc, char **argv)
 
             write(STDOUT_FILENO, buffer, n);
         } while (counter < length && n > 0);
+
+        if (n == -1)
+            perror("read");
 
         close(fd);
     }
