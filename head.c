@@ -67,7 +67,7 @@ int main(int argc, char **argv)
             fd = open(filename, O_RDONLY);
             if (fd < 0)
             {
-                printf("head: cannot open \'%s\' for reading: No such file or directory.\n", filename);
+                perror(filename);
                 continue;
             }
             if (remainingArgs > 1)
