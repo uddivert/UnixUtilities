@@ -27,14 +27,14 @@ int main(int argc, char **argv)
     // parse args with getopt
     int index;
     int c;
-    int remainingArgs = argc-1;
+    int remainingArgs = argc - 1;
     opterr = 0;
 
     // loop through all args and set values for length and whether to parse by line or
     // to parse by bytes
     while ((c = getopt(argc, argv, "c:n:")) != -1)
     {
-        remainingArgs-=2;
+        remainingArgs -= 2;
         switch (c)
         {
         case 'c':
@@ -47,12 +47,12 @@ int main(int argc, char **argv)
             break;
         }
     }
+
     // consider all remaining arguments to be files
     for (index = optind; index < argc; index++)
     {
         int fd;
         int n;
-        int counter = 0;
         char buffer[1];
 
         if (strcmp(argv[index], "-") == 0)
@@ -74,16 +74,36 @@ int main(int argc, char **argv)
                 printf("==> %s <==\n", filename);
         }
 
-        do
-        {
-            n = read(fd, buffer, 1);
-            if (parseByLine == 1 && buffer[0] == '\n')
-                counter++;
-            else if (parseByLine != 1)
-                counter++;
+        //get file size
+        off_t size = lseek(fd, 0, SEEK_END);
+        if (size == -1)
+            perror("lseek");
 
-            write(STDOUT_FILENO, buffer, n);
-        } while (counter < length && n > 0);
+        if (parseByLine == 0) // -c option
+        {
+            //skip to size - length
+            lseek(fd, size - length, 0);
+        }
+        else //-n option (default)
+        {
+            int offset = 0;
+            for (int linesPassed = 0; linesPassed < length && size + offset > 0; offset--)
+            {
+                //move endoffile - offset
+                lseek(fd, offset, SEEK_END);
+                read(fd, buffer, 1);
+                if (buffer[0] == '\n')
+                {
+                    linesPassed++;
+                }
+            }
+            if(size + offset == 0)
+                lseek(fd, 0, 0);
+        }
+
+        //print remainder of file
+        while ((n = read(fd, buffer, 1) > 0))
+            printf("%c", buffer[0]);
 
         if (n == -1)
             perror("read");
