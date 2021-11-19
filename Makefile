@@ -2,19 +2,11 @@ CC = gcc
 LFLAGS = -Wall -pedantic-errors
 CFLAGS = $(LFLAGS) -c
 
-wc: wc.o 
+compile: wc.o  head.o env.o true.o  false.o 
 	$(CC) $(LFLAGS) -o wc wc.o
-
-head: head.o 
 	$(CC) $(LFLAGS) -o head head.o
-
-env: env.o 
 	$(CC) $(LFLAGS) -o env env.o
-
-true: true.o 
 	$(CC) $(LFLAGS) -o true true.o
-
-false: false.o 
 	$(CC) $(LFLAGS) -o false false.o
 
 wc.o: wc.c 
@@ -33,5 +25,5 @@ false.o: false.c
 	$(CC) $(CFLAGS) false.c
 
 clean:
-	rm -f true false head env wc 
+	rm -f true false head env wc tail
 	rm -f *.o
