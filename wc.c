@@ -3,6 +3,14 @@
 #include <unistd.h>
 #include <string.h>
 
+/**
+ * @brief reads input files from parameters and writes the number of new lines,
+ * words, and bytes, in that order, contained in each input file to standard output
+ * 
+ * @param argc 
+ * @param argv 
+ * @return int 
+ */
 int main(int argc, char *argv[])
 {
     // turn off the buffer for printf
