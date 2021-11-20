@@ -1,5 +1,6 @@
-Name: **Uddhav Swami and Evan Altwarg**
-UGA ID: **811591208** **811420654**
+Names + UGA ID: 
+**Uddhav Swami 811591208**
+**Evan Altwarg  811420654**
  
 # How to compile
 1. Run `make compile` to compile the program 
