@@ -60,6 +60,50 @@ int main(int argc, char **argv)
             fd = STDIN_FILENO;
             if (remainingArgs > 1)
                 printf("==> standard input <==\n");
+
+            char bigBuffer[1000];
+            int position = 0;
+            while ((n = read(fd, buffer, 1)) > 0)
+            {
+                bigBuffer[position] = buffer[0];
+                position++;
+            }
+            if (parseByLine == 0)
+            {
+                for (int i = position - length; i < position; i++)
+                {
+                    printf("%c", bigBuffer[i]);
+                }
+            }
+            else
+            {
+                int lines = 0;
+                for (int i = 1000; i >= 0; i--)
+                {
+                    if (bigBuffer[i] == '\n')
+                        lines++;
+                    if (lines == length)
+                    {   
+                        i++;
+                        while (i < position)
+                        {
+                            printf("%c", bigBuffer[i]);
+                            i++;
+                        }
+                        i = 0;
+                        lines = -1;
+                    }
+                }
+                if (lines != -1)
+                {
+                    int i = 0;
+                    while (i < position)
+                    {
+                        printf("%c", bigBuffer[i]);
+                        i++;
+                    }
+                }
+            }
         }
         else
         {
@@ -72,42 +116,40 @@ int main(int argc, char **argv)
             }
             if (remainingArgs > 1)
                 printf("==> %s <==\n", filename);
-        }
+            //get file size
+            off_t size = lseek(fd, 0, SEEK_END);
+            if (size == -1)
+                perror("lseek");
 
-        //get file size
-        off_t size = lseek(fd, 0, SEEK_END);
-        if (size == -1)
-            perror("lseek");
-
-        if (parseByLine == 0) // -c option
-        {
-            //skip to size - length
-            lseek(fd, size - length, 0);
-        }
-        else //-n option (default)
-        {
-            int offset = 0;
-            for (int linesPassed = 0; linesPassed < length && size + offset > 0; offset--)
+            if (parseByLine == 0) // -c option
             {
-                //move endoffile - offset
-                lseek(fd, offset, SEEK_END);
-                read(fd, buffer, 1);
-                if (buffer[0] == '\n')
-                {
-                    linesPassed++;
-                }
+                //skip to size - length
+                lseek(fd, size - length, 0);
             }
-            if(size + offset == 0)
-                lseek(fd, 0, 0);
+            else //-n option (default)
+            {
+                int offset = 0;
+                for (int linesPassed = 0; linesPassed < length && size + offset > 0; offset--)
+                {
+                    //move endoffile - offset
+                    lseek(fd, offset, SEEK_END);
+                    read(fd, buffer, 1);
+                    if (buffer[0] == '\n')
+                    {
+                        linesPassed++;
+                    }
+                }
+                if (size + offset == 0)
+                    lseek(fd, 0, 0);
+            }
+
+            //print remainder of file
+            while ((n = read(fd, buffer, 1) > 0))
+                printf("%c", buffer[0]);
+
+            if (n == -1)
+                perror("read");
         }
-
-        //print remainder of file
-        while ((n = read(fd, buffer, 1) > 0))
-            printf("%c", buffer[0]);
-
-        if (n == -1)
-            perror("read");
-
         close(fd);
     }
     return 0;

@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
     for (int index = optind; index < argc; index++)
     {
         int fd, n, size;
-        char *filename;
+        char *filename = argv[index];
         char buffer[1];
         int l = 0, w = 0;
         int stdinFlag = 0;
@@ -56,7 +56,6 @@ int main(int argc, char *argv[])
         }
         else
         {
-            filename = argv[index];
             fd = open(filename, O_RDONLY);
         }
 
@@ -75,26 +74,34 @@ int main(int argc, char *argv[])
                         l++;
                     newWord = 1;
                 }
+                else if (buffer[0] == EOF)
+                {
+                    w++;
+                }
                 else if (newWord == 1)
                 {
+                    if (w == 0)
+                        w++;
                     w++;
                     newWord = 0;
                 }
                 if (cflag == 1)
                     size++;
             }
+            if (newWord == 1)
+                w++;
         } // while
 
         //print output
         if (lflag)
         {
             lTotal += l;
-            printf(" %i", l);
+            printf("%4d ", l);
         }
         if (wflag)
         {
             wTotal += w;
-            printf("  %i", w);
+            printf("%4d ", w);
         }
         if (cflag == 1)
         {
@@ -106,8 +113,8 @@ int main(int argc, char *argv[])
             }
 
             cTotal += size;
-            printf(" %i", size);
+            printf("%4d ", size);
         }
-        printf(" %s\n", filename);
+        printf("%s\n", filename);
     }
 } // main
