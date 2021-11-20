@@ -1,0 +1,6 @@
+[swami@ArsenalGear UnixUtilities]$ ./wc head.c 
+  93 913  2458 head.c
+[swami@ArsenalGear UnixUtilities]$ wc head.c 
+  93  319 2458 head.c
+
+the spacing on this is a little off. Need to add a space after the second number. 

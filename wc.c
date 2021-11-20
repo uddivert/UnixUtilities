@@ -44,14 +44,15 @@ int main(int argc, char *argv[])
     //assume all other args are files
     for (int index = optind; index < argc; index++)
     {
-        int fd, n;
+        int fd, n, size;
         char *filename;
         char buffer[1];
-
         int l = 0, w = 0;
+        int stdinFlag = 0;
         if (strcmp(argv[index], "-") == 0)
         {
             fd = STDIN_FILENO;
+            stdinFlag = 1;
         }
         else
         {
@@ -74,11 +75,13 @@ int main(int argc, char *argv[])
                         l++;
                     newWord = 1;
                 }
-                if (newWord == 1)
+                else if (newWord == 1)
                 {
                     w++;
                     newWord = 0;
                 }
+                if (cflag == 1)
+                    size++;
             }
         } // while
 
@@ -86,21 +89,25 @@ int main(int argc, char *argv[])
         if (lflag)
         {
             lTotal += l;
-            printf("  %i", l);
+            printf(" %i", l);
         }
         if (wflag)
         {
             wTotal += w;
-            printf(" %i ", w);
+            printf("  %i", w);
         }
         if (cflag == 1)
         {
-            off_t size = lseek(fd, 0, SEEK_END);
-            if (size == -1)
-                perror("lseek");
+            if (stdinFlag == 0)
+            {
+                size = lseek(fd, 0, SEEK_END);
+                if (size == -1)
+                    perror("lseek");
+            }
+
             cTotal += size;
-            printf(" %li ", size);
+            printf(" %i", size);
         }
-        printf("%s\n", filename);
+        printf(" %s\n", filename);
     }
 } // main
